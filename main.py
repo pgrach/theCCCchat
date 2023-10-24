@@ -2,6 +2,7 @@ import requests # for making HTTP requests
 from bs4 import BeautifulSoup # for parsing HTML
 import sqlite3 # integrating a database for storing all scraped PDF links
 
+from langchain.document_loaders import PyPDFLoader # to load and split the PDFs into smaller text segments
 
 
 

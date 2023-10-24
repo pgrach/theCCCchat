@@ -1,0 +1,65 @@
+
+
+1) INGESTION phase: to collect PDF links from the CCC publications website storing them in a SQLite database
+
+Scraping script: To collect all the PDF URLs from the website:
+ - Scrape the main publications page to collect links to individual publication pages.
+ - Visit each publication page to find and collect links to PDFs.
+ - find the links to PDFs using the collected links and store them in SQLite links.db 
+ 
+INGESTION sucessfully completed: 1321 links stored in SQLite db.
+
+future improvements:
+- deal with non-PDF publications, using UnstructuredHTMLLoader;
+- add weekly schedule for scrapping new publications
+
+2) 
+
+Main page patterns
+https://www.theccc.org.uk/publications/page/2/?topic&type=0-report
+https://www.theccc.org.uk/publications/page/3/?topic&type=0-report
+https://www.theccc.org.uk/publications/page/33/?topic&type=0-report
+
+
+Individual publication patterns:
+https://www.theccc.org.uk/publication/letter-ccc-advice-on-a-framework-for-reducing-global-aviation-emissions/
+https://www.theccc.org.uk/publication/building-a-low-carbon-economy-the-uks-contribution-to-tackling-climate-change-2/
+https://www.theccc.org.uk/publication/letter-ccc-advice-on-a-framework-for-reducing-global-aviation-emissions/
+https://www.theccc.org.uk/publication/letter-deep-coal-mining-in-the-uk/
+
+
+
+
+
+
+
+https://www.theccc.org.uk/wp-content/uploads/2023/07/CCC-Adaptation-and-social-justice.pdf
+https://www.theccc.org.uk/wp-content/uploads/2023/07/CCC-Adaptation-and-social-justice-cym.pdf
+
+https://www.theccc.org.uk/wp-content/uploads/2023/09/The-Implications-of-Behavioural-Science-for-Effective-Climate-Policy-Literature-Review-and-Background-Report-CAST.pdf
+https://www.theccc.org.uk/wp-content/uploads/2023/09/The-Implications-of-Behavioural-Science-for-Effective-Climate-Policy-Policy-Recommendations-CAST.pdf
+
+https://www.theccc.org.uk/wp-content/uploads/2023/08/Archetypes-representative-of-current-UK-rural-land-use-and-land-management-UKCEH.pdf
+
+https://www.theccc.org.uk/wp-content/uploads/2023/07/Spatial-planning-for-climate-resilience-and-net-zero-CSE-TCPA.pdf
+
+
+https://www.theccc.org.uk/wp-content/uploads/2022/11/Agroecology-%E2%80%93-a-Rapid-Evidence-Review-University-of-Aberdeen.pdf
+
+
+
+
+https://www.theccc.org.uk/wp-content/uploads/2023/09/230925-PF-MN-ZEV-Mandate-Response.pdf
+
+https://www.theccc.org.uk/wp-content/uploads/2023/07/CCC-Adaptation-and-social-justice.pdf
+https://www.theccc.org.uk/wp-content/uploads/2023/07/CCC-Adaptation-and-social-justice-cym.pdf
+
+https://www.theccc.org.uk/wp-content/uploads/2023/09/The-Implications-of-Behavioural-Science-for-Effective-Climate-Policy-Literature-Review-and-Background-Report-CAST.pdf
+https://www.theccc.org.uk/wp-content/uploads/2023/09/The-Implications-of-Behavioural-Science-for-Effective-Climate-Policy-Policy-Recommendations-CAST.pdf
+
+https://www.theccc.org.uk/wp-content/uploads/2023/08/Archetypes-representative-of-current-UK-rural-land-use-and-land-management-UKCEH.pdf
+
+https://www.theccc.org.uk/wp-content/uploads/2023/07/Spatial-planning-for-climate-resilience-and-net-zero-CSE-TCPA.pdf
+
+
+https://www.theccc.org.uk/wp-content/uploads/2022/11/Agroecology-%E2%80%93-a-Rapid-Evidence-Review-University-of-Aberdeen.pdf
