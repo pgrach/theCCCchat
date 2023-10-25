@@ -20,7 +20,7 @@ from dotenv import load_dotenv
 load_dotenv()  # Load variables from .env file
 openai_api_key = os.getenv('OPENAI_API_KEY')
 pinecone_api_key = os.getenv('PINECONE_API_KEY')
-pinecone_env = os.getenv('Pinecone Environment')
+pinecone_env = os.getenv('PINECONE_ENVIRONMENT')
 
 # Connect to SQLite database
 conn = sqlite3.connect('links.db')
@@ -69,7 +69,7 @@ if index_name not in pinecone.list_indexes():
     )
 
 # Connect to the new index
-index = pinecone.GRPCIndex(index_name)
+index = pinecone.Index(index_name)
 
 #Embedding Storage
 def create_and_store_embeddings(pages, temp_file_name):
@@ -82,7 +82,11 @@ def create_and_store_embeddings(pages, temp_file_name):
     # Store embeddings in Pinecone
     item_mapping = {f"item-{i}": embedding for i, embedding in enumerate(embeddings)}
     index.upsert(vectors=item_mapping)
-    os.remove(temp_file_name) #to clean up the tempfile after processing to free up disk space
+    try:
+        os.remove(temp_file_name)
+        print(f'Successfully deleted {temp_file_name}')
+    except Exception as e:
+        print(f'Failed to delete {temp_file_name}: {e}')
 
 
 def process_and_store(pdf_url):
@@ -105,5 +109,3 @@ with ThreadPoolExecutor() as executor:
     executor.map(process_and_store, pdf_urls)
 
 conn.close()
-# De-initialize Pinecone after all operations are completed
-pinecone.deinit()
