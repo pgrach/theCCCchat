@@ -2,8 +2,16 @@ import requests # for making HTTP requests
 from bs4 import BeautifulSoup # for parsing HTML
 import sqlite3 # integrating a database for storing all scraped PDF links
 
+
 from langchain.document_loaders import PyPDFLoader # to load and split the PDFs into smaller text segments
 
+# For creating Semantic Embeddings
+import os
+import getpass
+from langchain.vectorstores import FAISS
+from langchain.embeddings.openai import OpenAIEmbeddings
+
+os.environ['OPENAI_API_KEY'] = getpass.getpass('OpenAI API Key:')
 
 
 # Connect to SQLite database
@@ -40,7 +48,7 @@ def is_link_in_db(link):
 base_url = 'https://www.theccc.org.uk/publications'
 total_pages = 33
 
-
+# The main function to orchestrate the scraping
 def collect_all_pdf_links(base_url, total_pages):
     all_pdf_links = []
     for page_number in range(1, total_pages + 1):
@@ -82,10 +90,38 @@ def get_pdf_links(publication_url):
     pdf_links = [a['href'] for a in soup.find_all('a', href=True) if a['href'].endswith('.pdf')]
     return pdf_links
 
-# Now, start the scraping process
+# Execution of the scraping process
 all_pdf_links = collect_all_pdf_links(base_url, total_pages)
 
 # Deduplicate the links
 all_pdf_links = list(set(all_pdf_links))
 
 print(all_pdf_links[:10])  # First 10 links
+
+
+# Breaking Down PDFs
+def process_pdf(pdf_url):
+    response = requests.get(pdf_url)
+    with open('temp.pdf', 'wb') as temp_pdf_file:
+        temp_pdf_file.write(response.content)
+    
+    loader = PyPDFLoader('temp.pdf')
+    pages = loader.load_and_split()
+
+
+# Creating Semantic Embeddings
+def create_embeddings(pages):
+    faiss_index = FAISS.from_documents(pages, OpenAIEmbeddings())
+    return faiss_index
+
+# Efficient Storage and Retrieval
+
+
+# Iterating PROCESSING through All PDFs:
+cursor.execute("SELECT url FROM pdf_links")
+pdf_urls = cursor.fetchall()
+
+for pdf_url in pdf_urls:
+    pdf_url = pdf_url[0]  # Extract URL from tuple
+    print(f"Processing {pdf_url}")
+    process_pdf(pdf_url)

@@ -7,13 +7,20 @@ Scraping script: To collect all the PDF URLs from the website:
  - Visit each publication page to find and collect links to PDFs.
  - find the links to PDFs using the collected links and store them in SQLite links.db 
  
-INGESTION sucessfully completed: 1321 links stored in SQLite db.
+INGESTION successfully completed: 1321 links stored in SQLite db.
 
 future improvements:
 - deal with non-PDF publications, using UnstructuredHTMLLoader;
 - add weekly schedule for scrapping new publications
 
-2) 
+2) PROCESSING phase:
+
+- Breaking Down PDFs utilizing Langchain's PyPDFLoader into smaller text segments
+- Create semantic embeddings for the text segments utilizing OpenAI embeddings
+- Efficient Storage and Retrieval utilizing Pinecone
+
+
+
 
 Main page patterns
 https://www.theccc.org.uk/publications/page/2/?topic&type=0-report
