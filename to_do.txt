@@ -15,7 +15,7 @@ future improvements:
 
 2) PROCESSING phase:
 
-- Analyze the scope: created size.py. 1942.27 MB, www.theccc.org.uk: 1267 unique links 
+- Analyze the scope: created size.py. 1942.27 MB, www.theccc.org.uk: 1267 unique links
 - Breaking Down PDFs utilizing Langchain's PyPDFLoader into smaller text segments
 - Create semantic embeddings for the text segments utilizing OpenAI embeddings
 - Efficient Storage and Retrieval utilizing Pinecone
