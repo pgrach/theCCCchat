@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 import pinecone
 from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.text_splitter import CharacterTextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Pinecone
 from langchain.document_loaders import PyPDFLoader
 import traceback
@@ -22,10 +22,16 @@ pages = loader.load_and_split()
 if not pages:
     print("Error: The text file is empty.")
     exit(1)
-text_splitter = CharacterTextSplitter(chunk_size=2000, chunk_overlap=0)  # Adjust chunk_size
+
+text_splitter = RecursiveCharacterTextSplitter(  # Change this line
+    chunk_size=250,
+    chunk_overlap=50,
+    separators=["\n\n", "\n", " ", ""]
+)
+
 splitted_docs = text_splitter.split_documents(pages)
 
-# Initialize Pinecone with hardcoded values
+# Initialize Pinecone
 pinecone.init(api_key=pinecone_api_key, environment=pinecone_env)
 
 index_name = "langchain-demo"
