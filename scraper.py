@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS pdf_links (
 
 conn.commit()
 
+# Database Operations
 def store_link_in_db(link):
     """Store a link in the database."""
     try:
@@ -30,13 +31,13 @@ def is_link_in_db(link):
     cursor.execute("SELECT 1 FROM pdf_links WHERE url=?", (link,))
     return cursor.fetchone() is not None
 
+# Fetching & Parsing
 # Script will navigate through all the pages, find the PDF links, and save them to a list
-
 # Set the base URL and total number of pages
 base_url = 'https://www.theccc.org.uk/publications'
 total_pages = 33
 
-# The main function to orchestrate the scraping
+# The Main Logic to orchestrate scraping
 def collect_all_pdf_links(base_url, total_pages):
     all_pdf_links = []
     for page_number in range(1, total_pages + 1):
@@ -62,21 +63,29 @@ def collect_all_pdf_links(base_url, total_pages):
                 print(f"Skipping already scraped publication: {publication_url}")
     return all_pdf_links
 
-# Scrape through the main publications pages to collect links to individual publication pages:
-def get_publication_links(page_url):
-    response = requests.get(page_url) # send GET request to the page URL to retrieve the page content
-    response.raise_for_status()  # Check if the request was successful
-    soup = BeautifulSoup(response.content, 'html.parser')
-    publication_links = [a['href'] for a in soup.find_all('a', href=True) if 'publication/' in a['href']]
-    return publication_links
+def fetch_content(url):
+    """Fetches content from the given URL and returns the BeautifulSoup object."""
+    response = requests.get(url)
+    response.raise_for_status()
+    return BeautifulSoup(response.content, 'html.parser')
 
-# Visit each publication page to find and collect links to PDFs
+def extract_publication_links(soup):
+    """Parses the soup object to extract publication links."""
+    return [a['href'] for a in soup.find_all('a', href=True) if 'publication/' in a['href']]
+
+def extract_pdf_links(soup):
+    """Parses the soup object to extract PDF links."""
+    return [a['href'] for a in soup.find_all('a', href=True) if a['href'].endswith('.pdf')]
+
+def get_publication_links(page_url):
+    """Fetch content and extract publication links."""
+    soup = fetch_content(page_url)
+    return extract_publication_links(soup)
+
 def get_pdf_links(publication_url):
-    response = requests.get(publication_url)
-    response.raise_for_status()  # Check if the request was successful
-    soup = BeautifulSoup(response.content, 'html.parser')
-    pdf_links = [a['href'] for a in soup.find_all('a', href=True) if a['href'].endswith('.pdf')]
-    return pdf_links
+    """Fetch content and extract PDF links."""
+    soup = fetch_content(publication_url)
+    return extract_pdf_links(soup)
 
 def main():
     # Execution of the scraping process

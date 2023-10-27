@@ -21,6 +21,8 @@ future improvements:
 - Create semantic embeddings for the text segments utilizing OpenAI embeddings
 - Efficient Storage and Retrieval utilizing Pinecone
 
+PROCESSING success: able to process small and large pdf links providing progress bar.
+
 future improvements: 
 - PDF URL and the Pinecone index name are hardcoded now
 - indexing strategies for large amount of data
@@ -30,13 +32,15 @@ future improvements:
 - Set up the language model and the question-answering chain utilizing langchain.llms OpenAI
 - Interact with the user to get their queries and display results ulilizing similarity_search via Embeddings and vectorstores
 
+INTERACTION success: able to chat with the PDF.
+
 future improvements: 
 - Error Handling improvements
 - web-based interface utilizing Streamlit
 
 
-
-
+Inspiration for Future Ideas:
+Build a universal engine for chatting with any pdf publications directory on web
 
 
 Main page patterns
