@@ -1,47 +1,4 @@
-
-
-1) INGESTION phase: to collect PDF links from the CCC publications website storing them in a SQLite database
-
-Scraping script: To collect all the PDF URLs from the website:
- - Scrape the main publications page to collect links to individual publication pages.
- - Visit each publication page to find and collect links to PDFs.
- - find the links to PDFs using the collected links and store them in SQLite links.db 
- 
-INGESTION success: 1321 links stored in SQLite db.
-
-future improvements:
-- deal with non-PDF publications, using UnstructuredHTMLLoader;
-- add weekly schedule for scrapping new publications
-
-2) PROCESSING phase:
-
-- Analyze the scope: created size.py. 1942.27 MB, www.theccc.org.uk: 1267 unique functional pdfs
-- Breaking Down PDFs by pages utilizing Langchain's PyPDFLoader "load_and_split" method
-- Splitting into smaller text segments utilizing Langchain's RecursiveCharacterTextSplitter
-- Create semantic embeddings for the text segments utilizing OpenAI embeddings
-- Efficient Storage and Retrieval utilizing Pinecone
-
-PROCESSING success: able to process small and large pdf links providing progress bar.
-
-future improvements: 
-- PDF URL and the Pinecone index name are hardcoded now
-- indexing strategies for large amount of data
-
-3) INTERACTION phase:
-- Initialize Pinecone and set up document search utilizing OpenAIEmbeddings and Langchain's vectorstores
-- Set up the language model and the question-answering chain utilizing langchain.llms OpenAI
-- Interact with the user to get their queries and display results ulilizing similarity_search via Embeddings and vectorstores
-
-INTERACTION success: able to chat with the PDF.
-
-future improvements: 
-- Error Handling improvements
-- web-based interface utilizing Streamlit
-
-
-Inspiration for Future Ideas:
-Build a universal engine for chatting with any pdf publications directory on web
-
+Paterns search:
 
 Main page patterns
 https://www.theccc.org.uk/publications/page/2/?topic&type=0-report
@@ -54,9 +11,6 @@ https://www.theccc.org.uk/publication/letter-ccc-advice-on-a-framework-for-reduc
 https://www.theccc.org.uk/publication/building-a-low-carbon-economy-the-uks-contribution-to-tackling-climate-change-2/
 https://www.theccc.org.uk/publication/letter-ccc-advice-on-a-framework-for-reducing-global-aviation-emissions/
 https://www.theccc.org.uk/publication/letter-deep-coal-mining-in-the-uk/
-
-
-
 
 
 
