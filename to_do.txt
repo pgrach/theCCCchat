@@ -23,12 +23,18 @@ future improvements:
 
 future improvements: 
 - PDF URL and the Pinecone index name are hardcoded now
-- indexing strategies
+- indexing strategies for large amount of data
 
-Secret ingredient for sucessful Large data processing:
-- BytesIO object which is a type of in-memory file stream - avoiding saving the file (Langchain doesn't support BytesIO), 
-workaround by using PyPDF2 to process the PDF data from a BytesIO object
-- 
+3) INTERACTION phase:
+- Initialize Pinecone and set up document search utilizing OpenAIEmbeddings and Langchain's vectorstores
+- Set up the language model and the question-answering chain utilizing langchain.llms OpenAI
+- Interact with the user to get their queries and display results ulilizing similarity_search via Embeddings and vectorstores
+
+future improvements: 
+- Error Handling improvements
+- web-based interface utilizing Streamlit
+
+
 
 
 
