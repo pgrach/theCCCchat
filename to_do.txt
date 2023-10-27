@@ -20,6 +20,11 @@ future improvements:
 - Create semantic embeddings for the text segments utilizing OpenAI embeddings
 - Efficient Storage and Retrieval utilizing Pinecone
 
+Secret ingredient for sucessful Large data processing:
+- BytesIO object which is a type of in-memory file stream - avoiding saving the file (Langchain doesn't support BytesIO), 
+workaround by using PyPDF2 to process the PDF data from a BytesIO object
+- 
+
 
 
 
@@ -71,3 +76,5 @@ https://www.theccc.org.uk/wp-content/uploads/2023/07/Spatial-planning-for-climat
 
 
 https://www.theccc.org.uk/wp-content/uploads/2022/11/Agroecology-%E2%80%93-a-Rapid-Evidence-Review-University-of-Aberdeen.pdf
+
+

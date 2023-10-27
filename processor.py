@@ -3,11 +3,12 @@ import sqlite3
 import requests
 
 #to allow concurrence
-import hashlib 
 from concurrent.futures import ThreadPoolExecutor
 
 # to load and split the PDFs into smaller text segments
-from langchain.document_loaders import PyPDFLoader 
+from langchain.document_loaders import PyPDFLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.vectorstores import Pinecone
 
 # For creating Semantic Embeddings, storage and retrival
 import os
@@ -16,6 +17,10 @@ import pinecone
 
 #to call API keys from .env
 from dotenv import load_dotenv
+
+import logging
+logging.basicConfig(filename='debug.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+
 
 load_dotenv()  # Load variables from .env file
 openai_api_key = os.getenv('OPENAI_API_KEY')
@@ -32,33 +37,19 @@ def process_pdf(pdf_url):
         response = requests.get(pdf_url)
         response.raise_for_status()  # Check if the request was successful
     except requests.RequestException as e:
-        print(f"Failed to retrieve {pdf_url}: {e}")
+        logging.error(f"Failed to retrieve {pdf_url}: {e}")
         return None
-    
-    # Generate a unique hash for the current URL
-    url_hash = hashlib.md5(pdf_url.encode()).hexdigest()
-    temp_file_name = f'temp_{url_hash}.pdf'
+        
+    loader = PyPDFLoader(pdf_url)
+    pages = loader.load_and_split()    
+    return pages  # Return pages for further processing
 
-
-    with open(temp_file_name, 'wb') as temp_pdf_file:
-        temp_pdf_file.write(response.content)
-    
-    loader = PyPDFLoader(temp_file_name)
-    pages = loader.load_and_split()
-    
-    return pages, temp_file_name  # Return pages and temp_file_name for further processing
-
-
-# Creating Semantic Embeddings, Efficient Storage and Retrieval
-
-# Initialize Pinecone
+# Pinecone setup
 pinecone.init(
     api_key=pinecone_api_key,
     environment=pinecone_env
-)
-
-# Define your Pinecone index name
-index_name = "langchain-retrieval-augmentation"
+)# Define your Pinecone index name
+index_name = "langchain-retrieval-large"
 
 # Create a new index if it doesn't already exist
 if index_name not in pinecone.list_indexes():
@@ -71,41 +62,57 @@ if index_name not in pinecone.list_indexes():
 # Connect to the new index
 index = pinecone.Index(index_name)
 
-#Embedding Storage
-def create_and_store_embeddings(pages, temp_file_name):
-    documents = [page.page_content for page in pages]
-    
-    # Generate embeddings for the text segments
-    embeddings_model = OpenAIEmbeddings()
-    embeddings = embeddings_model.embed_documents(documents)
-    
-    # Store embeddings in Pinecone
-    item_mapping = {f"item-{i}": embedding for i, embedding in enumerate(embeddings)}
-    index.upsert(vectors=item_mapping)
+# Embedding Storage
+def create_and_store_embeddings(pages):
     try:
-        os.remove(temp_file_name)
-        print(f'Successfully deleted {temp_file_name}')
-    except Exception as e:
-        print(f'Failed to delete {temp_file_name}: {e}')
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=250,
+            chunk_overlap=50,
+            separators=["\n\n", "\n", " ", ""]
+        )
 
+        for page_tuple in pages: 
+            logging.debug(f"Page tuple: {page_tuple}")  # Log the page_tuple here
+            page_content = page_tuple[0]  # Index into page_tuple to get page_content
+            metadata = page_tuple[1]  # Index into page_tuple to get metadata
+            logging.debug(page_content)
+            documents = text_splitter.split_documents(page_content)
+            logging.debug(documents)
+            embedding = OpenAIEmbeddings(open_ai_key=openai_api_key)
+            response = Pinecone.from_documents(documents=documents, embedding=embedding, index_name='langchain-retrieval-large')
+            
+            # Debugging
+            embeddings = embedding.embed_texts([doc.text for doc in documents])
+            logging.debug(type(documents))  # Log the type of documents
+            logging.debug(documents)  # Log the contents of documents
+            if documents:  # Check that documents is not empty
+                doc = documents[0]  # Get the first document
+                logging.debug(type(doc))  # Log the type of doc
+                logging.debug(dir(doc))  # Log the attributes and methods of doc
+            logging.debug(embeddings)
+            logging.debug(response)
+        logging.info("Successful upload")
+    except Exception as e:
+        logging.error(f"Error: {e}")
 
 def process_and_store(pdf_url):
     pdf_url = pdf_url[0]
-    print(f"Processing {pdf_url}")
-    pages, temp_file_name = process_pdf(pdf_url)
+    logging.info(f"Processing {pdf_url}")
+
+    pages = process_pdf(pdf_url)
     if pages:
-        print(f"Processed {len(pages)} pages from {pdf_url}")
-        create_and_store_embeddings(pages, temp_file_name)
+        logging.info(f"Processed {len(pages)} pages from {pdf_url}")
+        create_and_store_embeddings(pages)
     else:
-        print(f"Failed to process {pdf_url}")
+        logging.error(f"Failed to process {pdf_url}")
 
 # Iterating PROCESSING through PDFs from 2022 and 2023:
 # cursor.execute("SELECT url FROM pdf_links WHERE url LIKE 'https://www.theccc.org.uk/wp-content/uploads/2023%' OR url LIKE 'https://www.theccc.org.uk/wp-content/uploads/2022%'")
-cursor.execute("SELECT url FROM pdf_links WHERE id IN (1, 2, 3, 4)")
+cursor.execute("SELECT url FROM pdf_links WHERE id IN (1, 2)")
 pdf_urls = cursor.fetchall()
 
-# processing loop
-with ThreadPoolExecutor() as executor:
-    executor.map(process_and_store, pdf_urls)
+# Temporarily replace ThreadPoolExecutor with sequential processing for debugging
+for pdf_url in pdf_urls:
+    process_and_store(pdf_url)
 
 conn.close()
