@@ -7,7 +7,7 @@ Scraping script: To collect all the PDF URLs from the website:
  - Visit each publication page to find and collect links to PDFs.
  - find the links to PDFs using the collected links and store them in SQLite links.db 
  
-INGESTION successfully completed: 1321 links stored in SQLite db.
+INGESTION success: 1321 links stored in SQLite db.
 
 future improvements:
 - deal with non-PDF publications, using UnstructuredHTMLLoader;
@@ -15,10 +15,15 @@ future improvements:
 
 2) PROCESSING phase:
 
-- Analyze the scope: created size.py. 1942.27 MB, www.theccc.org.uk: 1267 unique links
-- Breaking Down PDFs utilizing Langchain's PyPDFLoader into smaller text segments
+- Analyze the scope: created size.py. 1942.27 MB, www.theccc.org.uk: 1267 unique functional pdfs
+- Breaking Down PDFs by pages utilizing Langchain's PyPDFLoader "load_and_split" method
+- Splitting into smaller text segments utilizing Langchain's RecursiveCharacterTextSplitter
 - Create semantic embeddings for the text segments utilizing OpenAI embeddings
 - Efficient Storage and Retrieval utilizing Pinecone
+
+future improvements: 
+- PDF URL and the Pinecone index name are hardcoded now
+- indexing strategies
 
 Secret ingredient for sucessful Large data processing:
 - BytesIO object which is a type of in-memory file stream - avoiding saving the file (Langchain doesn't support BytesIO), 
