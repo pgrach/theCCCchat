@@ -11,7 +11,7 @@ Welcome to our project that enables AI-driven conversations with PDF content. Th
 - [Interaction Phase](#3-interaction-phase)
 - [Future Ideas](#inspiration-for-future-ideas)
 
-![image](assets/32228270/09e9738f-238e-43dc-aca3-31483ae8bbcd.png)
+<img src="https://github.com/pgrach/theCCCchat/assets/32228270/09e9738f-238e-43dc-aca3-31483ae8bbcd">
 
 ## 1. Ingestion Phase
 
