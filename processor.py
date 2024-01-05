@@ -54,7 +54,7 @@ def create_embeddings(pinecone_api_key, pinecone_env, split_docs):
 def main():
     openai_api_key, pinecone_api_key, pinecone_env = initialize_environment()
     # Replace with your PDF URL (yes, it is hardcoded still)
-    pdf_url = "https://www.theccc.org.uk/wp-content/uploads/2023/09/The-Implications-of-Behavioural-Science-for-Effective-Climate-Policy-Literature-Review-and-Background-Report-CAST.pdf"
+    pdf_url = "https://www.theccc.org.uk/wp-content/uploads/2023/09/230925-PF-MN-ZEV-Mandate-Response.pdf"
     pages = load_and_split_pdf(pdf_url)
     split_docs = split_into_segments(pages)
     docsearch = create_embeddings(pinecone_api_key, pinecone_env, split_docs)

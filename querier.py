@@ -7,6 +7,11 @@ from langchain.chains.question_answering import load_qa_chain
 from langchain.prompts import PromptTemplate
 from langchain.memory import ConversationBufferMemory
 import langchain.vectorstores
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 
 def initialize_environment():
     """Load environment variables and return necessary configurations."""
@@ -19,14 +24,27 @@ def initialize_environment():
 
 def setup_search(pinecone_api_key, pinecone_env, namespace):
     """Initialize Pinecone and set up document search."""
-    pinecone.init(api_key=pinecone_api_key, environment=pinecone_env)
-    embeddings = OpenAIEmbeddings()
-    index_name = "langchain-demo"
     try:
-        return langchain.vectorstores.Pinecone.from_existing_index(index_name, embeddings, namespace=namespace)
-    except:
-        return langchain.vectorstores.Pinecone(index_name=index_name)
-
+        pinecone.init(api_key=pinecone_api_key, environment=pinecone_env)
+        embeddings = OpenAIEmbeddings()
+        index_name = "langchain-demo"
+        # Try to connect to an existing index
+        index = langchain.vectorstores.Pinecone.from_existing_index(index_name, embeddings, namespace=namespace)
+        logging.info(f"Connected to existing index: {index_name}")
+        return index
+    except Exception as e:
+        # Log the exception if connecting to the existing index fails
+        logging.error(f"Failed to connect to existing index: {index_name}. Error: {e}")
+        # Attempt to create a new index if it does not exist
+        try:
+            index = langchain.vectorstores.Pinecone(index_name=index_name, embeddings=embeddings, namespace=namespace)
+            logging.info(f"Created new index: {index_name}")
+            return index
+        except Exception as e:
+            # Log the exception if creating the index fails
+            logging.error(f"Failed to create new index: {index_name}. Error: {e}")
+            # Re-raise the exception to handle it upstream or terminate the script
+            raise
 
 def setup_llm(openai_api_key):
     """Set up the language model and the question-answering chain."""
@@ -50,6 +68,7 @@ def user_interaction(docsearch, chain, namespace):
         if user_query.lower() == 'exit':
             break
         docs = docsearch.similarity_search(user_query, namespace=namespace)
+        print(f"Retrieved Docs: {docs}")  # This will print the retrieved documents.
         answer = chain.run(input_documents=docs, question=user_query, human_input=user_query)
         print(f"Answer: {answer}")
 
